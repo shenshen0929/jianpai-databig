@@ -1,5 +1,5 @@
 <template>
-  <div class="channel-warp" :style="{paddingTop: paddingTop}">
+  <div class="channel-warp">
     <div class="duration-channel-warp">
       <div v-for="(item, index) in durationList" :key="index">
         <OneBarChart
@@ -15,7 +15,7 @@
     </div>
     <div class="duration-channel-warp">
       <div v-for="(item, index) in durationMonthList" :key="index">
-        <FourLineChart
+        <MOreLineSmallChart
           :cdata="{
             category: category,
             unit: '天',
@@ -23,19 +23,21 @@
             data: item,
             name: '时长',
           }"
-        ></FourLineChart>
+        ></MOreLineSmallChart>
       </div>
     </div>
     <div class="rate-channel-warp">
-      <TwoBarChart
-        :cdata="{
-          category: channelCategory,
-          title: '各渠道订单总数量',
-          data: countList,
-        }"
-      ></TwoBarChart>
-      <div v-for="(item, key) in trendList" :key="key">
-        <FourLineChart
+      <div class="count-brand-warp item-channel">
+        <TwoBarChart
+          :cdata="{
+            category: channelCategory,
+            title: '各渠道订单总数量',
+            data: countList,
+          }"
+        ></TwoBarChart>
+      </div>
+      <div v-for="(item, key) in trendList" :key="key" class="item-channel">
+        <MOreLineRateChart
           :cdata="{
             category: category,
             unit: '%',
@@ -43,35 +45,29 @@
             data: item,
             legendIsTop: 'bottom',
           }"
-        ></FourLineChart>
+        ></MOreLineRateChart>
       </div>
-      <dv-border-box-1 class="total-chart">
-        <div class="total-table-warp">
-          <div class="total-table-title" :style="{fontSize: fontSizeNum}">各渠道平均总时长(天)</div>
-          <div class="total-table">
-            <div
-              class="total-table-item"
-              v-for="(item, index) in channelCategory"
-              :key="item.title"
-            >
-              <p class="colorBlue item-title">{{ item }}</p>
-              <div>
-                <NumberScroll :number="channelDuration[index]" />
-              </div>
-            </div>
-          </div>
+      <div class="total-table-warp-channel">
+        <div class="title-table">
+          各渠道平均总时长(天)
         </div>
-      </dv-border-box-1>
+        <div>
+          <NumberScroll
+            :data="{ tableData: channelDuration, titleItem: channelCategory }"
+          />
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import OneBarChart from "@/components/new_echarts/bar/one_bar_chart.vue";
-import FourLineChart from "@/components/new_echarts/line/more_line_chart.vue";
-import TwoBarChart from "@/components/new_echarts/bar/more_bar_chart.vue";
+import OneBarChart from "@/components/charts/one-bar-small-chart";
+import MOreLineSmallChart from "@/components/charts/more-line-small-charts";
+import MOreLineRateChart from "@/components/charts/more-line-rate-charts";
+import TwoBarChart from "@/components/charts/more-bar-big-chart";
 import NumberScroll from "@/components/numberScroll";
-import { fontSize } from "./../common";
+import { scaleData } from "@/utils/drawMixin";
 import {
   stageItemList,
   getDimensionData,
@@ -82,16 +78,17 @@ import { saleschannelconfirmDate, saleschannel_ontime } from "./../api";
 export default {
   components: {
     OneBarChart,
-    FourLineChart,
+    MOreLineRateChart,
+    MOreLineSmallChart,
     TwoBarChart,
     NumberScroll,
   },
   data() {
     return {
+      scale: {},
       durationList: [],
       stageItemList,
-       paddingTop: '50px',
-       fontSizeNum: '16px',
+      paddingTop: "50px",
       category: [],
       durationMonthList: [],
       // 各渠道数量
@@ -138,8 +135,8 @@ export default {
   created() {
     this.getSalesChannelconfirmDate(this.$route.query);
     this.getSaleschannel_ontime(this.$route.query);
-    this.paddingTop = `${fontSize(80)}px`
-    this.fontSizeNum = `${fontSize(16)}px`
+    const scale = scaleData();
+    this.scale = scale;
   },
   watch: {
     $route() {
@@ -171,47 +168,46 @@ export default {
 
 <style lang="scss">
 .channel-warp {
-   padding-left:20px;
-  padding-right: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  padding-top: 40px;
+  margin-top: 20px;
+  box-shadow: 0px 0px 10px #244cce;
+  background-color: #f6f6f7;
+  transform-origin: center 0;
   .duration-channel-warp {
+    width: 95%;
     display: grid;
-    grid-template-columns: 3fr 3fr 3fr 3fr 3fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   }
   .rate-channel-warp {
-    display: grid;
-    grid-template-columns: 4fr 3fr 3fr 4fr;
-  }
-  .total-table-warp {
-    width: 100%;
-    padding: 25px;
-    .total-table-title {
-      color: rgb(79, 104, 141);
-      font-size: 1.8vh;
-      font-weight: 600;
-    }
-  }
-  .total-chart {
-    height: 80%;
-  }
-  .total-table {
+    width: 95%;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
+    margin-top: 40px;
+    box-shadow: 0px 0px 10px #244cce;
+    border-radius: 10px;
+
+    .count-brand-warp {
+      box-shadow: 0px 0px 10px #244cce;
+      border-radius: 10px;
+    }
+    .item-channel {
+      flex: 1;
+      padding: 10px;
+    }
+  }
+
+  .total-table-warp-channel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    .item-title  {
-      font-size: 12px;
-    }
-    .total-table-item {
-      border-radius: 6px;
-      padding-top: 8px;
-      margin-top: 8px;
-      width: 25%;
-      height: 50px;
-      .dv-dig-flop {
-        width: 150px;
-        height: 30px;
-      }
-    }
+    width: 250px;
+    box-shadow: 0px 0px 10px #244cce;
+    border-radius: 10px;
   }
 }
 </style>

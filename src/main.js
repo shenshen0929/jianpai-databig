@@ -3,7 +3,7 @@ import App from "./App.vue";
 import router from "./router";
 import store from "./store";
 import dataV from "@jiaminghi/data-view";
-import chinaJson from "@/components/new_echarts/map/china.json";
+import chinaJson from "@/components/charts/map/china.json";
 import {
   Loading,
   Message,

@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div class="duration-brand-warp">
     <MoreBarChart
       :cdata="{
@@ -82,4 +82,4 @@ export default {
 };
 </script>
 
-<style></style>
+<style></style> -->

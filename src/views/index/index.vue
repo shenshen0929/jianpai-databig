@@ -4,7 +4,7 @@
       A&nbsp;&nbsp;R&nbsp;&nbsp;R&nbsp;&nbsp;O&nbsp;&nbsp;W&nbsp;&nbsp;&nbsp;&nbsp;箭&nbsp;&nbsp;&nbsp;牌&nbsp;&nbsp;&nbsp;家&nbsp;&nbsp;&nbsp;居
     </h1>
     <div class="contruduction-warp">
-      <el-carousel height="50vh">
+      <el-carousel height="40vh">
         <el-carousel-item v-for="item in imageList" :key="item">
           <div class="pic-warp">
             <img :src="item" alt="图片" />
@@ -73,10 +73,12 @@
 
 <script>
 let timerRoute = null;
+import { scaleData } from "@/utils/drawMixin";
 export default {
   data() {
     return {
       imageList: [],
+      scale: {},
       flowTitle: [
         {
           title: "开料",
@@ -110,14 +112,16 @@ export default {
     };
   },
   mounted() {
-    timerRoute = setTimeout(() => {
-      this.$router.push("/datav");
-    }, 50000);
+    // timerRoute = setTimeout(() => {
+    //   this.$router.push("/datav");
+    // }, 50000);
   },
   beforeDestroy() {
     clearInterval(timerRoute);
   },
   created() {
+    const scale = scaleData();
+    this.scale = scale;
     const arr = [];
     for (let i = 0; i < 7; i++) {
       arr.push(require(`@/assets/lb_${i + 1}.png`));
@@ -140,11 +144,12 @@ export default {
 .index-warp {
   color: #000000;
   padding: 30px;
+  transform-origin: center 0;
   h1 {
     text-align: center;
     font-size: 45px;
     padding-bottom: 30px;
-    color: #f3f3ed;
+    color: #3f4faa;
     margin-bottom: 1vw;
     text-shadow: 4px 4px 3px #92c5dd;
   }
@@ -152,13 +157,21 @@ export default {
     display: flex;
     justify-content: space-around;
     .el-carousel {
-      width: 40vw;
-      border-radius: 10px;
-      box-shadow: 7px 5px 30px #aec0c9;
+      // box-shadow: 7px 5px 30px #aec0c9;
+      transform-origin: center 0;
+      width: 60vh;
+      .el-carousel__indicators--horizontal {
+        top: 0;
+        .el-carousel__button {
+          width: 2vh;
+        }
+      }
       .pic-warp {
         display: flex;
         align-items: center;
         justify-content: center;
+        // width: 100%;
+        // height: 100%;
         img {
           width: 100%;
           height: 100%;
@@ -172,7 +185,7 @@ export default {
       height: 50vh;
       width: 50vw;
       overflow: hidden;
-      box-shadow: 7px 5px 30px #57707c;
+      box-shadow: 0px 0px 10px #244cce;
       border-radius: 10px;
       .content-block {
         animation: scroll 20s linear infinite;
@@ -204,8 +217,8 @@ export default {
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 7px 5px 30px #57707c;
-      padding: 1vw 1.5vw 1vw 2vw;
+      box-shadow: 0px 0px 10px #244cce;
+      padding: 2vw 2vw 2vw 3vw;
       border-radius: 10px;
     }
     .flow-every {

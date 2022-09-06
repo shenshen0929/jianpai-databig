@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div class="department-warp">
     <dv-border-box-6>
       <div class="every-column-warp">
@@ -201,4 +201,4 @@ export default {
     }
   }
 }
-</style>
+</style> -->

@@ -1,88 +1,63 @@
 <template>
-  <div class="number">
-    {{
-      typeof number === "string" && number.includes("%")
-        ? `${showNumber}%`
-        : showNumber
-    }}
+  <div class="total-table total-table-warp">
+    <div
+      :class="
+        index % 2 === 0
+          ? 'total-table-item'
+          : 'total-table-item total-table-item-other'
+      "
+      v-for="(item, index) in dataList['tableData']"
+      :key="item"
+    >
+      <div class="colorBlue item-title">{{ dataList["titleItem"][index] }}</div>
+      <div>
+        <NumberScroll :number="item" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import moment from "moment";
-const numberTimer = null;
-const timer = null;
+import NumberScroll from "./number.vue";
+import { scaleData } from "@/utils/drawMixin";
 export default {
-  props: ["number"],
+  components: {
+    NumberScroll,
+  },
+  props: ["data"],
   data() {
     return {
-      showNumber: 0,
-      outTime: moment(),
+      dataList: [],
+      scale: {},
     };
   },
+  created() {
+    const scale = scaleData();
+    this.scale = scale;
+  },
   watch: {
-    number(newData) {
-      this.numberHandle(newData);
-    },
-    outTime() {
-      this.numberHandle(this.number);
-    },
-  },
-  mounted() {
-    setInterval(() => {
-      this.outTime = moment();
-      this.showNumber = 0;
-    }, 50000);
-    if (this.number) {
-this.numberHandle(this.number);
-    }
-    
-  },
-  beforeDestroy() {
-    if (numberTimer) {
-      clearInterval(numberTimer);
-    }
-    if (timer) {
-      clearInterval(timer);
-    }
-  },
-  methods: {
-    numberHandle(data) {
-      let num = data;
-      let level = 2;
-      if (typeof data === "string" && data.includes("%")) {
-        num = data.slice(0, length - 1);
-      }
-      if (num <= 100 && num > 50) {
-        level = 5;
-      } else if (num > 100 && num < 500) {
-        level = 10;
-      } else if (num >= 500 && num < 1000) {
-        level = 50;
-      } else if (num >= 1000 && num < 5000) {
-        level = 100;
-      } else if (num >= 5000) {
-        level = 500;
-      }
-      
-      const timer = setInterval(() => {
-        if (num - this.showNumber < level) {
-          this.showNumber = num;
-          clearInterval(timer);
-          return;
-        }
-        console.log(num, this.showNumber)
-        this.showNumber = +this.showNumber + level
-      }, 100);
+    data(newData) {
+      this.dataList = newData;
     },
   },
 };
 </script>
 
-<style>
-.number {
-  color: rgb(57, 79, 76);
-  text-align: left;
-  font-size: 16px;
+<style lang="scss">
+.total-table-warp {
+  height: 80%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  .total-table-item {
+    width: 200px;
+    font-size: 20px;
+    .item-title {
+      line-height: 40px;
+      font-weight: 600;
+      text-align: center;
+    }
+  }
 }
 </style>

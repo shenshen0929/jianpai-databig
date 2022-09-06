@@ -141,15 +141,14 @@ export const getCategory = (arr) => {
 };
 
 export function fontSize(res) {
-  const scale = 1920/1080
+  const scale = 1920 / 1080;
   const clientWidth =
     window.innerWidth ||
     document.documentElement.clientWidth ||
     document.body.clientWidth;
-    console.log(window)
   if (!clientWidth) return;
-  if ((window.screen.width / window.screen.height) === scale) {
-    return res
+  if (window.screen.width / window.screen.height === scale) {
+    return res;
   }
   let fontSize = clientWidth / 1920;
   return res * fontSize;
@@ -315,4 +314,3 @@ export const defaultDate = () => {
     end,
   };
 };
-

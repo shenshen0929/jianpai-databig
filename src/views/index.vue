@@ -1,5 +1,10 @@
 <template>
-  <dv-full-screen-container class="data-warp-container">
+  <div
+    class="data-warp-container"
+    :style="{
+      transform: `scale(${scale.width}, ${scale.height})`,
+    }"
+  >
     <div class="data-warp">
       <div class="sign">
         <div class="english">ARROW</div>
@@ -33,20 +38,16 @@
         </div>
       </div>
       <div class="content-warp">
-        <dv-border-box-11
-          class="content-container"
-          title="景德镇卫浴大数据平台"
-        >
-          <keep-alive><router-view /> </keep-alive>
-        </dv-border-box-11>
+        <keep-alive><router-view /> </keep-alive>
       </div>
     </div>
-  </dv-full-screen-container>
+  </div>
 </template>
 
 <script>
 import { defaultDate } from "./common";
 import moment from "moment";
+import { scaleData } from "@/utils/drawMixin";
 
 let timerTab = null;
 
@@ -80,7 +81,9 @@ export default {
       ],
       pathArr: ["totality", "brand", "channel", "province"],
       dateValue: "",
+      scale: {},
       useDate: {},
+      drawTiming: null,
       pickerOptions: {
         disabledDate(time) {
           const year = `${new Date().getFullYear()}-01-01`;
@@ -90,6 +93,8 @@ export default {
     };
   },
   created() {
+    const scale = scaleData();
+    this.scale = scale;
     const obj = defaultDate();
     this.useDate = defaultDate();
     this.dateValue = [new Date(obj.start), new Date(obj.end)];
@@ -107,9 +112,11 @@ export default {
     //     );
     //   }
     // }, 10000);
+    window.addEventListener("resize", this.resize);
   },
   beforeDestroy() {
     clearTimeout(timerTab);
+    window.removeEventListener("resize", this.resize);
   },
   computed: {
     tabIndex() {
@@ -131,6 +138,13 @@ export default {
         end,
       };
     },
+    resize() {
+      clearTimeout(this.drawTiming);
+      this.drawTiming = setTimeout(() => {
+        const scale = scaleData();
+        this.scale = scale;
+      }, 200);
+    },
   },
 };
 </script>
@@ -139,6 +153,7 @@ export default {
 .data-warp-container {
   width: 100%;
   height: 100%;
+  transform-origin: center 0;
   .data-warp {
     width: 100%;
     height: 100%;
@@ -153,7 +168,7 @@ export default {
       .english {
         font-size: 24px;
       }
-      .chinese{
+      .chinese {
         font-size: 20px;
         margin-top: 8px;
       }
@@ -185,7 +200,7 @@ export default {
         font-weight: 700;
         padding: 4px 0;
         .nav-router {
-          color: #000000;
+          color: rgba(0, 0, 0, 0.5);
           width: 50%;
           height: 100%;
           display: flex;
@@ -195,14 +210,14 @@ export default {
         }
         .active {
           color: #ffffff;
-          background: #000000;
+          background: rgba(91, 155, 213);
           border-radius: 10px;
         }
       }
     }
     .content-warp {
       width: 100%;
-      height: 93%;
+      // height: calc(100vh - 90px);
       .content-container {
         width: 100%;
       }

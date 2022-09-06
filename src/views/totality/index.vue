@@ -1,70 +1,51 @@
 <template>
-  <div class="total-warp" :style="{paddingTop: paddingTop}">
+  <div class="total-warp">
     <!-- 时长流程图 -->
-    <div class="show-flow-button" @click="showFlowChartHandle">
+    <!-- <div class="show-flow-button" @click="showFlowChartHandle">
       {{ isShowFlowChart ? "收起" : "展开" }}流程图
-    </div>
-      <div class="flow-chart-warp" ref="flowChartWarp" v-if="isShowFlowChart">
-        <div
-          v-for="(item, index) in flowChartList"
-          :key="item.subTitle"
-          class="flow-chart-item"
-        >
-          <div class="flow-chart-content">
-            <div class="flow-chart-title">{{ item.title }}</div>
-            <div class="flow-chart-subtitle">{{ item.subTitle }}</div>
-          </div>
-          <div class="arrow-align" v-if="index < 5">
-            <img src="@/assets/arrowAlign.png" alt="箭牌家居" />
-          </div>
-          <div class="arrow-colums" v-if="index < 5">
-            <img src="@/assets/arrowColums.png" alt="" />
-            <div class="flow-data">({{ everyStepTime[index] }}天)</div>
-          </div>
+    </div> -->
+    <div class="flow-chart-warp" ref="flowChartWarp" v-if="isShowFlowChart">
+      <div
+        v-for="(item, index) in flowChartList"
+        :key="item.subTitle"
+        class="flow-chart-item"
+      >
+        <div class="flow-chart-content">
+          <div class="flow-chart-title">{{ item.title }}</div>
+          <div class="flow-chart-subtitle">{{ item.subTitle }}</div>
+        </div>
+        <div class="arrow-align" v-if="index < 5">
+          <img src="@/assets/arrowAlign.png" alt="箭牌家居" />
+        </div>
+        <div class="arrow-colums" v-if="index < 5">
+          <img src="@/assets/arrowColums.png" alt="" />
+          <div class="flow-data">({{ everyStepTime[index] }}天)</div>
         </div>
       </div>
+    </div>
     <!--月份数量-->
     <div class="total-chart-warp">
-      <div>
-        <dv-border-box-12 :class="isShowFlowChart ? 'normal' : 'big'">
-          <CenterLeft
-            :cdata="{ data: mountData, category, title: '订单数量变化' }"
-          />
-        </dv-border-box-12>
+      <div class="count-chart item-warp">
+        <MOreBarBig
+          :cdata="{ data: mountData, category, title: '近六个月订单数量变化' }"
+        />
       </div>
-      <div>
-        <dv-border-box-1 :class="isShowFlowChart ? 'normal' : 'big'">
-          <div class="total-table total-table-warp">
-            <div
-              :class="
-                index % 2 === 0
-                  ? 'total-table-item'
-                  : 'total-table-item total-table-item-other'
-              "
-              v-for="(item, index) in titleItem"
-              :key="item"
-            >
-              <p class="colorBlue item-title">{{ item }}</p>
-              <div>
-                <NumberScroll :number="tableData[index]" />
-              </div>
-            </div>
-          </div>
-        </dv-border-box-1>
+      <div class="table-data">
+        <div class="title-table">2022.03至2022.07月数据</div>
+        <NumberScroll :data="{ tableData, titleItem }" />
       </div>
-      <dv-border-box-12 :class="isShowFlowChart ? 'normal' : 'big'">
-        <div>
-          <MoreLineChart
-            :cdata="{
-              data: rateData,
-              category,
-              unit: '%',
-              title: '准交率变化趋势',
-            }"
-            :category="category"
-          ></MoreLineChart>
-        </div>
-      </dv-border-box-12>
+
+      <div class="item-warp">
+        <MoreLineChart
+          :cdata="{
+            data: rateData,
+            category,
+            unit: '%',
+            title: '准交率变化趋势',
+          }"
+          :category="category"
+        ></MoreLineChart>
+      </div>
     </div>
     <!--各阶段时长-->
     <div class="time-chart-warp">
@@ -73,7 +54,7 @@
         :key="index"
         :class="isShowFlowChart ? 'normal' : 'bigLine'"
       >
-        <CenterRight
+        <OneLineSmallChart
           :cdata="{
             data: item,
             category: category,
@@ -81,17 +62,18 @@
             title: stageItemList[index],
             name: '时长',
           }"
-        ></CenterRight>
+        ></OneLineSmallChart>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import CenterLeft from "@/components/new_echarts/bar/more_bar_chart.vue";
-import CenterRight from "@/components/new_echarts/line/one-line-chart.vue";
-import MoreLineChart from "@/components/new_echarts/line/more_line_chart.vue";
+import MOreBarBig from "@/components/charts/more-bar-big-chart";
+import OneLineSmallChart from "@/components/charts/one-line-small-charts";
+import MoreLineChart from "@/components/charts/more-line-rate-charts";
 import NumberScroll from "@/components/numberScroll";
+import { scaleData } from "@/utils/drawMixin";
 import {
   stageItemList,
   mountHandleTotal,
@@ -106,8 +88,8 @@ import { fontSize } from "./../common";
 
 export default {
   components: {
-    CenterLeft,
-    CenterRight,
+    MOreBarBig,
+    OneLineSmallChart,
     MoreLineChart,
     NumberScroll,
   },
@@ -120,6 +102,7 @@ export default {
   data() {
     return {
       skeletonStyle,
+      scale: {},
       flowChartList: [
         {
           title: "创建订单",
@@ -147,8 +130,8 @@ export default {
           subTitle: "delivery_date",
         },
       ],
-       paddingTop: '50px',
-       fontSizeNum: '16px',
+      paddingTop: "50px",
+      fontSizeNum: "16px",
       stageItemList,
       tableNumberStyle,
       category: [],
@@ -168,10 +151,12 @@ export default {
     };
   },
   created() {
+    const scale = scaleData();
+    this.scale = scale;
     this.getTotalData(this.$route.query);
     this.getAll_ontime(this.$route.query);
-    this.paddingTop = `${fontSize(100)}px`
-    this.fontSizeNum = `${fontSize(16)}px`
+    this.paddingTop = `${fontSize(100)}px`;
+    this.fontSizeNum = `${fontSize(16)}px`;
   },
   methods: {
     getTotalData(params) {
@@ -204,38 +189,37 @@ export default {
   flex-direction: column;
   align-items: center;
   position: relative;
- padding-left:20px;
-  padding-right: 20px;
-  width: 100%;
-  height: 100%;
-  .show-flow-button {
-    position: absolute;
-    top: 50px;
-    left: 2%;
-    font-size: 16px;
-    color: black;
-    font-weight: 600;
-    background: #fff;
-    padding: 8px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  .big {
-    transform: scale(1, 1.5) translateY(1vh);
-    transform-origin: left top;
-  }
-  .bigLine {
-    transform: scale(1, 1.5) translateY(13.5vh);
-  }
-  .normal {
-    transform: scale(1, 1);
-  }
-
+  // height: calc(100vh - 90px);
+  padding-top: 60px;
+  transform-origin: center 0;
+  translate: 0 20px;
+  box-shadow: 0px 0px 10px #244cce;
+  // .show-flow-button {
+  //   position: absolute;
+  //   top: 50px;
+  //   left: 2%;
+  //   font-size: 16px;
+  //   color: black;
+  //   font-weight: 600;
+  //   background: #fff;
+  //   padding: 8px;
+  //   border-radius: 5px;
+  //   cursor: pointer;
+  // }
+  // .big {
+  //   transform: scale(1, 1.5) translateY(1vh);
+  //   transform-origin: left top;
+  // }
+  // .bigLine {
+  //   transform: scale(1, 1.5) translateY(13.5vh);
+  // }
+  // .normal {
+  //   transform: scale(1, 1);
+  // }
   .flow-chart-warp {
     display: flex;
-    width: 80%;
-    justify-content: space-between;
-    margin-top: 30px;
+    width: 70%;
+    justify-content: center;
     .flow-chart-label {
       font-size: 16px;
       font-weight: 500;
@@ -277,7 +261,7 @@ export default {
           height: 80px;
         }
         .flow-data {
-          padding:10px;
+          padding: 10px;
           color: #398bff;
           font-size: 20px;
           font-weight: 600;
@@ -287,22 +271,35 @@ export default {
       }
     }
   }
-  .total-chart-warp {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-  .total-table-warp {
-    width: 100%;
-    height: 90%;
-    padding: 20px;
-    .item-title  {
-      font-size: 12px;
+  .table-data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 500px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px #244cce;
+    .title-table {
+      color: rgb(83, 109, 146);
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 48px;
     }
   }
+  .item-warp {
+    flex: 1;
+  }
+
+  .total-chart-warp {
+    width: 95%;
+    margin: 20px 0;
+    display: flex;
+    border-radius: 20px;
+    box-shadow: 0px 0px 10px #244cce;
+  }
   .time-chart-warp {
-    width: 100%;
+    width: 95%;
     display: grid;
+    // translate: 0 60px;
     grid-template-columns: 3fr 3fr 3fr 3fr 3fr;
   }
 }

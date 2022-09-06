@@ -1,5 +1,5 @@
 <template>
-  <div class="brand-warp" style="paddingTop: 60px">
+  <div class="brand-warp">
     <div class="duration-brand-warp">
       <div v-for="(item, index) in durationList" :key="index">
         <OneBarChart
@@ -15,7 +15,7 @@
     </div>
     <div class="duration-brand-warp">
       <div v-for="(item, index) in durationMonthList" :key="index">
-        <FourLineChart
+        <MoreLineSmallChart
           :cdata="{
             category: category,
             unit: '天',
@@ -23,74 +23,65 @@
             data: item,
             name: '时长',
           }"
-        ></FourLineChart>
+        ></MoreLineSmallChart>
       </div>
     </div>
     <div class="rate-brand-warp">
-      <TwoBarChart
-        :cdata="{
-          category: brandCategory,
-          title: '各品牌订单数量',
-          data: countList,
-        }"
-      ></TwoBarChart>
-      <div v-for="(item, key) in trendList" :key="key">
-        <FourLineChart
+      <div class="count-brand-warp">
+        <MoreBarBig
           :cdata="{
-            category: category,
-            unit: '%',
-            title: '各品牌准交率趋势' + item.title,
-            data: item,
-            legendIsTop: 'bottom',
+            category: brandCategory,
+            title: '各品牌订单数量',
+            data: countList,
           }"
-        ></FourLineChart>
+        ></MoreBarBig>
       </div>
-      <dv-border-box-1 class="total-chart">
-        <div class="total-table-warp">
-          <div>
-            <div class="total-table-title" :style="{fontSize: fontSizeNum}">各品牌平均总时长(天)</div>
-            <div class="total-table">
-              <div
-                class="total-table-item"
-                v-for="(item, index) in brandCategory"
-                :key="item.title"
-              >
-                <p class="ml-3 colorBlue fw-b fs-xl">{{ item }}</p>
-                <div>
-                  <NumberScroll :number="brandDuration[index]" />
-                </div>
-              </div>
-            </div>
+      <div class="rate-item">
+        <div v-for="(item, key) in trendList" :key="key" class="rate-flex">
+          <MoreLineRateChart
+            :cdata="{
+              category: category,
+              unit: '%',
+              title: '各品牌准交率趋势' + item.title,
+              data: item,
+              legendIsTop: 'bottom',
+            }"
+          ></MoreLineRateChart>
+        </div>
+      </div>
+      <div class="total-table-warp-brand">
+        <div>
+          <div class="title-table">
+            各品牌平均总时长(天)
           </div>
-          <div>
-            <div class="total-table-title total-table-last" :style="{fontSize: fontSizeNum}">
-              各品牌入库订单总数量占比
-            </div>
-            <div class="total-table">
-              <div
-                class="total-table-item"
-                v-for="(item, index) in brandCategory"
-                :key="item.title"
-              >
-                <p class="item-title colorBlue">{{ item }}</p>
-                <div>
-                  <NumberScroll :number="brandMound[index]" />
-                </div>
-              </div>
-            </div>
+          <div class="total-table">
+            <NumberScroll
+              :data="{ tableData: brandDuration, titleItem: brandCategory }"
+            />
           </div>
         </div>
-      </dv-border-box-1>
+        <div>
+          <div class="title-table">
+            各品牌入库订单总数量占比
+          </div>
+          <div class="total-table">
+            <NumberScroll
+              :data="{ tableData: brandMound, titleItem: brandCategory }"
+            />
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import OneBarChart from "@/components/new_echarts/bar/one_bar_chart.vue";
-import FourLineChart from "@/components/new_echarts/line/more_line_chart.vue";
-import TwoBarChart from "@/components/new_echarts/bar/more_bar_chart.vue";
+import OneBarChart from "@/components/charts/one-bar-small-chart";
+import MoreLineSmallChart from "@/components/charts/more-line-small-charts";
+import MoreLineRateChart from "@/components/charts/more-line-rate-charts";
+import MoreBarBig from "@/components/charts/more-bar-big-chart";
 import NumberScroll from "@/components/numberScroll";
-import { fontSize } from "./../common";
+import { scaleData } from "@/utils/drawMixin";
 import {
   stageItemList,
   getDimensionData,
@@ -101,8 +92,9 @@ import { orgnameconfirmDate, orgname_ontime } from "./../api";
 export default {
   components: {
     OneBarChart,
-    FourLineChart,
-    TwoBarChart,
+    MoreLineSmallChart,
+    MoreLineRateChart,
+    MoreBarBig,
     NumberScroll,
   },
   data() {
@@ -119,15 +111,15 @@ export default {
       brandCategory: [],
       brandDuration: [],
       brandMound: [],
-      paddingTop: '50px',
-      fontSizeNum: '16px'
+      paddingTop: "50px",
+      scale: {},
     };
   },
   created() {
     this.getOrgnameconfirmData(this.$route.query);
     this.getorGname_ontime(this.$route.query);
-    this.paddingTop = `${fontSize(50)}px`
-    this.fontSizeNum = `${fontSize(16)}px`
+    const scale = scaleData();
+    this.scale = scale;
   },
   watch: {
     $route() {
@@ -160,33 +152,49 @@ export default {
 <style lang="scss">
 @import "./../common.scss";
 .brand-warp {
-  width: 100%;
-  padding-left:20px;
-  padding-right: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f6f6f7;
+  box-shadow: 0px 0px 10px #244cce;
+  padding-bottom: 20px;
+  padding-top: 40px;
+  margin-top: 20px;
+  transform-origin: center 0;
   .duration-brand-warp {
     display: grid;
-    grid-template-columns: 3fr 3fr 3fr 3fr 3fr;
+    width: 95%;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   }
   .rate-brand-warp {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-  }
-  .total-table-warp {
-    height: 90%;
-    padding: 20px 20px 40px 40px;
-    .total-table-title {
-      color: rgb(79, 104, 141);
-      font-weight: 600;
+    width: 95%;
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-around;
+    box-shadow: 0px 0px 10px #244cce;
+    .rate-item {
+      display: flex;
+      justify-content: space-around;
+      flex: 2;
+      padding-bottom: 20px;
+      .rate-flex {
+        flex: 1;
+      }
     }
-    .total-table-last {
-      margin-top: 10px;
+    .count-brand-warp {
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px #244cce;
+      flex: 1;
     }
-    .item-title {
-      font-size: 12px;
+    .total-table-warp-brand {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      width: 250px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px #244cce;
     }
-  }
-  .total-chart {
-    height: 90%;
   }
 }
 </style>

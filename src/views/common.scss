@@ -1,20 +1,4 @@
 .total-table {
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: start;
-  align-items: center;
-  .total-table-item {
-    border-radius: 6px;
-    padding-top: 0px;
-    margin-top: 8px;
-    width: 35%;
-    height: 50px;
-    .dv-dig-flop {
-      width: 150px;
-      height: 30px;
-    }
-  }
   .total-table-item-other {
     width: 30%;
   }
