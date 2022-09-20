@@ -10,6 +10,11 @@ const routes = [
     component: () => import("../views/index/index.vue"),
   },
   {
+    path: "/stepData",
+    name: "index",
+    component: () => import("../views/stepTable"),
+  },
+  {
     path: "/datav",
     name: "datav",
     component: () => import("../views/index.vue"),

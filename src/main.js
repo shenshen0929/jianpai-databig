@@ -12,6 +12,8 @@ import {
   DatePicker,
   Carousel,
   carouselItem,
+  Table,
+  TableColumn,
 } from "element-ui";
 // 引入全局css
 import "./assets/scss/style.scss";
@@ -30,6 +32,8 @@ Vue.component(skeletonItem.name, skeletonItem);
 Vue.component(DatePicker.name, DatePicker);
 Vue.component(Carousel.name, Carousel);
 Vue.component(carouselItem.name, carouselItem);
+Vue.component(Table.name, Table);
+Vue.component(TableColumn.name, TableColumn);
 //引入echart
 //4.x 引用方式
 import echarts from "echarts";

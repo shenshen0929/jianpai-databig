@@ -182,7 +182,7 @@ export default {
       padding: 30px;
       font-size: 22px;
       line-height: 44px;
-      height: 50vh;
+      height: 40vh;
       width: 50vw;
       overflow: hidden;
       box-shadow: 0px 0px 10px #244cce;
@@ -212,7 +212,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-
+    margin-top: 10vh;
     .flow-warp-content {
       display: flex;
       align-items: center;
