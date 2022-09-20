@@ -1,7 +1,12 @@
 <template>
   <div class="step-warp">
-    <div class="title">木工开料</div>
-    <el-table :data="tableData" :row-class-name="tableRowClassName">
+    <div class="title">{{ title }}</div>
+    <el-table
+      :data="tableData"
+      :row-class-name="tableRowClassName"
+      v-loading="isLoading"
+      element-loading-text="拼命加载中"
+    >
       <el-table-column
         prop="BatchCode"
         label="合批号"
@@ -74,11 +79,14 @@ export default {
   data() {
     return {
       tableData: [],
+      isLoading: true,
+      title: "",
     };
   },
   created() {
     orderListApi().then((res) => {
-      const step = this.$route.query.step ? +this.$route.query.step : 0;
+      const step = this.$route.query.step ? +this.$route.query.step : 1;
+      this.title = processNameList[step];
       const arr = [];
       res.data.forEach((item) => {
         const value = item.ProcessID
@@ -89,7 +97,7 @@ export default {
           arr.push(item);
         }
       });
-      console.log(arr);
+      this.isLoading = false;
       this.tableData = arr;
     });
   },
@@ -153,6 +161,9 @@ export default {
     line-height: 8vh;
     text-align: center;
   }
+  .el-table {
+    min-height: 400px;
+  }
   .el-table .isUrgent-row {
     color: rgb(255, 32, 32);
   }
@@ -160,7 +171,7 @@ export default {
     background: yellow;
   }
   .el-table__body {
-    animation: scroll 600s linear infinite;
+    animation: scroll 1800s linear infinite;
   }
 }
 </style>

@@ -26,6 +26,7 @@ import "vue-awesome/icons/chart-line.js";
 import "vue-awesome/icons/align-left.js";
 
 Vue.component(Loading);
+Vue.use(Loading.directive);
 Vue.component(Message);
 Vue.component(Skeleton.name, Skeleton);
 Vue.component(skeletonItem.name, skeletonItem);

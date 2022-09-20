@@ -1,5 +1,5 @@
 export const processNameList = {
-  1: "开料",
+  1: "木工开料",
   2: "封边",
   3: "排钻",
   4: "拣配",
